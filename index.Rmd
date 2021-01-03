@@ -1,0 +1,412 @@
+---
+title: <center><FONT COLOR="darkblue">English Premier League 2019/2020</FONT></center>
+subtitle: "Vicente Celis (viceron@alumni.uv.es)"
+author: "Universitat de València"
+date: "Diciembre de 2020 (actualizado el `r format(Sys.time(), '%d-%m-%Y')`)"
+output:
+  html_document:
+    #css: "./assets/my_css_file.css"
+    theme: paper
+    highlight: textmate 
+    toc: true
+    toc_depth: 3 
+    toc_float: 
+      collapsed: true
+      smooth_scroll: true
+    self_contained: true
+    number_sections: false
+    df_print: kable
+    code_download: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r packages-setup, include = FALSE}
+library(tidyverse)
+library(klippy)  
+library(knitr)
+library(readxl)
+library(ggplot2)
+library(dplyr)
+library(ggthemes)
+library(leaflet)
+library(gganimate)
+library(plotly)
+library(kableExtra)
+library(wordcloud2)
+library(reactable)
+library(vembedr)
+library(viridis)
+library(hrbrthemes)
+```
+
+```{r chunk-setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, message = FALSE, warning = FALSE, 
+                      #results = "hold",
+                      cache = FALSE, cache.path = "/caches/", comment = "#>",
+                      #fig.width = 7, #fig.height= 7,   
+                      #out.width = 7, out.height = 7,
+                      collapse = TRUE,  fig.show = "hold",
+                      fig.asp = 7/9, out.width = "85%", fig.align = "center")
+knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
+```
+
+```{r options-setup, include = FALSE}
+options(scipen = 999) #- para quitar la notación científica
+options("yaml.eval.expr" = TRUE) 
+```
+
+
+```{r klippy, echo = FALSE}
+klippy::klippy(position = c("top", "right")) #- remotes::install_github("rlesur/klippy")
+```
+
+<hr class="linea-black">
+
+Trabajo elaborado para la asignatura "Programación y manejo de datos en la era del Big Data" de la Universitat de València durante el curso 2020-2021. El repo del trabajo está [aquí](https://github.com/vicentecelisr/trabajo_BigData){target="_blank"}. La página web de la asignatura y los trabajos de mis compañeros pueden verse [aquí](https://vicentecelisr.github.io/intro-ds-20-21-web/07-trabajos.html){target="_blank"}.
+
+<hr class="linea-red">
+
+
+-----------------
+
+<br>
+
+```{r eval=TRUE, echo=FALSE}
+knitr::include_graphics(here::here("imagenes", "premierl.png"))
+
+```
+
+
+# <FONT COLOR="darkblue">1. Introducción</FONT>
+
+Este trabajo se realiza con el fin de analizar las estadisticas de los equipos y jugadores de la primera division de la liga de Inglaterra. Considerada una de las 5 grandes ligas europeas que para muchos, sus 38 jornadas, la convierten en la mas competitiva y relevante del mundo, tambien gracias a su historia y a la participacion de tantos grandes clubes como Manchester United, Chelsea, Liverpool entre otros. Ilutraremos la tabla de clasificacion de cada equipo, el Campeon de la liga, los descensos a la segunda division y los equipos que alcanzaron las maximas competiciones europeas (Champions League y Europa League). Ademas estudiaremos los maximos goleadores de la temporada tanto por equipos como jugadores mediante la utilizacion de graficos ilustrativos. Por ultimo, conoceremos los estadios donde se juegan los partidos de esta maxima competicion, señalando varios aspectos interesantes que nos ayudaran a adentrarnos a un mas en esta grandiosa competicion inglesa. 
+
+----------------
+
+## <FONT COLOR="darkblue">Datos</FONT> {.tabset .tabset-pills}
+
+### <FONT COLOR="darkblue">**Fuente de los Datos**</FONT> 
+
+
+Los datos fueron obtenidos de varias paginas como el diario Marca, Wikipedia y la pagina oficial de la Premier Leaguey luego fueron modificados por mi en un excel incluido en la carpeta datos. La manipulacion de los datos se realizaron gracias a los slides y tutoriales sumkn istrados por el profesor de la materia Pedro Perez.
+
+
+### <FONT COLOR="darkblue">**Codigos**</FONT>
+
+```{r eval=TRUE, include=TRUE, echo=TRUE}
+
+clasif <- read_excel("./datos/premier-league.xlsx", sheet = 1)
+
+max_gol <- read_excel("./datos/premier-league.xlsx", sheet = 2 )
+
+jornada <- read_excel("./datos/premier-league.xlsx", sheet = 3 )
+
+clasif_1 <- clasif %>% filter(!(is.na(Clasif2021))) %>% select(Pos, Equipo, Pts, Clasif2021)
+
+str(clasif_1)  
+
+clasif_1 <- clasif_1 %>% mutate(Equipo = forcats::as_factor(Equipo))  
+
+str(clasif_1) 
+
+levels(clasif_1$Equipo)
+
+clasif_1 <- clasif_1 %>% mutate(Equipo = forcats::fct_reorder(Equipo, Pts)) 
+
+levels(clasif_1$Equipo)
+
+top_gf <- clasif %>% select(Equipo, GF) %>% slice_max(GF, n = 5)
+
+str(top_gf)  
+
+top_gf <- top_gf %>% mutate(Equipo = forcats::as_factor(Equipo))  
+
+str(top_gf) 
+
+levels(top_gf$Equipo)
+
+top_gf <- top_gf %>% mutate(Equipo = forcats::fct_reorder(Equipo, GF)) 
+
+levels(top_gf$Equipo)
+
+
+leaflet() %>% addTiles() %>% leafem::addMouseCoordinates()
+
+```
+
+
+----------------
+
+#  <FONT COLOR="darkblue">2. Tabla de la English Premier League Temporada 2019/2020</FONT>
+
+La temporada 2019/2020 fue un año muy singular y esto debido a la pandemia mundial que todos conocemos como lo fue el coronavirus. Esta situacion pandemica provoco la detencion de los partidos desde la jornada 28 del 1 de Marzo hasta el 17 de junio que se pudo reanudar. Sin embargo y pese a estos 3 meses de la falta de este gran futbol, dejo varios aspectos relevantes: lograr el Liverpool conseguir el titulo de campeon después de 30 años tras su última victoria y primero con la denominacion Premier League. Ademas haberlo conseguido rompiendo varios records como ser el primer equipo de la competición y de Europa que clasificó más anticipadamente a la fase de grupos de la Liga de Campeones de la UEFA (12 fechas de anticipación). Tambien cabe a destacar que introdujo por primera vez la tecnologia VAR (Video Arbitraje).
+
+> "Es increíble ser campeón con este equipo. Ha sido muy fácil motivar a los jugadores por la gran historia que tiene el club. Es un logro increíble para mis jugadores, lo es todo lo que han hecho durante los últimos tres años". Jürgen Klopp 
+
+```{r eval=TRUE, echo=FALSE}
+
+kable(clasif) %>%
+  kableExtra::kable_styling(fixed_thead = list(enabled = T, background = "lightblue")) %>%  column_spec(3, bold = T, color = "white", background = "lightblue") 
+
+
+```
+
+
+### <FONT COLOR="darkblue">Una forma de visualizar los puntos obtenidos en la liga</FONT>
+
+```{r eval=TRUE, echo=FALSE}
+
+clasif_2 <- clasif %>% select(c(Equipo, Pts))
+
+wordcloud2(data = clasif_2, size = 0.3)
+
+```
+
+----------------
+
+
+# <FONT COLOR="darkblue">Evolucion Partidos cada Jornada</FONT>
+
+En este grafico podemos observar la evolucion en la posicion de los equipos por cada jornada jugada. Muy claro dese el principio, el Manchester City y el Liverpool claros candidatos a llevarse el titulo ya que comenzaron ganando partido tras partido con respecto a sus otros contrincantes. Por lo que la verdadera batalla estuvo en os puestos europeos desde la tercera posicion hasta la sexta.
+
+
+
+
+
+```{r eval = TRUE, echo = FALSE}
+knitr::include_graphics(here::here("imagenes", "liverpool-champions.jpg"))
+
+```
+
+----------------
+
+#   <FONT COLOR="darkblue">3. Analisis Clasificacion Siguiente Temporada</FONT> 
+## <FONT COLOR="darkblue">Competiciones Europeas y Descenso de Categoria</FONT> {.tabset .tabset-pills}
+
+
+En esta grafica podemos observar la clasificacon a competiciones europeas de los primeros clasificados en la tabla y sus respectivos puntos onseguidos, los primeros 4 puestos clasifican a la Champions League y los 5 y 6 lugar a la Europa Legue. Podemos destacar la actuacion del Arsenal que al haber ganado la FA Cup tuvo como premio formar parte de la Europa League. Por ultimo, observamos los 3 equipos con menos puntos (Watford, Bournemouth y Norwich City) que jugaran la proxima temporada 20/21 en la segunda division de inglaterra (EFL Championship).
+
+
+
+### <FONT COLOR="darkblue">**Grafico 1**</FONT> 
+
+```{r eval = TRUE, echo = FALSE}
+
+p <- ggplot(clasif_1, aes(x = Equipo, y = Pts)) + 
+  geom_col(fill = c("midnightblue", "midnightblue", "midnightblue", 
+                      "midnightblue", "chocolate1", "chocolate1", "chocolate1", "red", "red", "red")) 
+
+p + labs(title = "Clasificacion Siguiente Temporada",
+       subtitle = "(Europa y Descenso)",
+       caption = "Elaboracion propia",
+       x = "Equipos",
+       y = "Puntos totales") + theme_light() + 
+  geom_text(aes(label = Pts),nudge_y = 3, colour = "black") + coord_flip() +
+  annotate(geom = "text", x = 2, y = 55, label = "Descenso", size = 4) +
+  annotate(geom = "text", x= 5, y = 80, label = "Europa League", size = 4) +
+  annotate(geom = "text", x= 8, y = 90, label = "Champions League", size = 4)
+
+```
+
+
+### <FONT COLOR="darkblue">**Grafico 2**</FONT> 
+
+```{r eval = TRUE, echo = FALSE}
+
+g2 <- ggplot (clasif_1, aes(x=Equipo, y = Pts), aes(fct_rev(Equipo))) + 
+  geom_bar(stat="identity",aes(fill = Clasif2021)) +
+  coord_flip() + theme(legend.position = "none") + labs(title = "Clasificacion Siguiente Temporada",
+           subtitle = "(Europa y Descenso)",
+           caption = "Elaboracion propia",
+           x = "Equipos",
+           y = "Puntos totales")
+
+g2
+
+```
+
+
+----------------
+
+
+#   <FONT COLOR="darkblue">4. Analisis Goles Anotados</FONT> 
+
+## <FONT COLOR="darkblue">Equipos con mas Goles Anotados</FONT> {.tabset .tabset-pills}
+
+En este grafico 3 estudiamos a los 5 grandes clubes que anotaron mayores goles esta temporada. Destacamos al Manchester City que logro sobrepasar la brecha de los 100 goles anotando 102 goles esta temporada. Tambien podemos concluir que estos equipos son igualmente los 5 primeros en la tabla de clasificacion por lo que mientras mas goles anotados mas posibilidades tienes de sumar mayor cantidad de puntos y colocarse en lo mas alto de la tabla. En el grafico 4 encontramos a todos los equipos de la temporada, con 1034 goles y una media de 51,4 goles por equipo y de 27,21 goles por partido termina la tempoara atipica en Inglaterra.
+
+
+### <FONT COLOR="darkblue">**Grafico 3**</FONT> 
+
+```{r eval=TRUE, echo=FALSE}
+
+p <- ggplot(top_gf, aes(x = Equipo, y = GF)) + 
+  geom_bar(stat = "identity", fill = c("cadetblue1", "red", "mediumblue", "mediumblue", "red")) +
+  theme_bw() 
+
+p <- p + labs(title = "Gráfico 1: Equipos Goleadores en la Temporada 19/20",
+       subtitle = "(Top 5 Mas Goles Anotados)",
+       caption = "Elaboracion propia",
+       x = "Equipos",
+       y = "Goles A Favor") +
+  geom_text(aes(label = GF),nudge_y = 3, colour = "black")
+
+p
+
+```
+
+
+### <FONT COLOR="darkblue">**Grafico 4**</FONT> 
+
+```{r eval = TRUE, echo=FALSE}
+
+g4 <- ggplot(clasif, aes(x=Equipo, y=GF)) + 
+    geom_point(col="darkblue", size=3) +   
+    geom_segment(aes(x=Equipo, 
+                     xend=Equipo, 
+                     y=min(GF), 
+                     yend=max(GF)), 
+                 linetype="dotted", 
+                 size=0.1) +   
+    labs(title="Mas Goles Anotados en la Temporada 19/20", 
+         subtitle="Make Vs Avg. Mileage", 
+         caption="Elaboracion propia", y = "Goles A Favor") +  
+    coord_flip()
+
+g4
+
+```
+
+
+----------------
+
+##  <FONT COLOR="darkblue">Los Pichichis (Jugadores con mas goles en la temporada)</FONT>
+
+```{r eval = TRUE, echo = FALSE}
+
+knitr::include_graphics(here::here("imagenes", "Jamie-Vardy.jpg"))
+
+```
+
+
+En esta tabla podemos observar a los maximos anotadores y las estadisticas de cada jugador respecto a los partidos y minutos jugados en todos los partidos de la temporada. En el como maximo goleador aparece el jugador ingles Jamie Vardy (Leicester City) con 23 dianas, seguido de un empate en goles y terminando el podio el jugador gabones Pierre-Emerick Aubameyang (Arsenal) y el jugador ingles Danny Ings (Southampton).
+
+
+```{r eval = TRUE, echo = FALSE}
+
+kable(max_gol) %>%
+  kableExtra::kable_styling(fixed_thead = list(enabled = T, background = "lightblue")) %>%
+  kable_paper(full_width = F) %>% column_spec(4, color = "white",
+            background = spec_color(mtcars$drat[1:8], end = 0.7),
+            popover = paste("am:", mtcars$am[1:8])) %>%
+  column_spec(2, color = spec_color(mtcars$mpg[1:8]),
+              link = "https://www.premierleague.com/stats/top/players/goals?se=274")
+
+```
+
+
+### <FONT COLOR="darkblue">Otra forma de visualizar los goleadores de la temporada</FONT>
+
+Esta vez analizamos los goles anotados por cada minuto de juego, podemos observar que los jugaodres con menor ratio de goles por minuto y que tienen menos minutos dentro de la cancha son los jugadores con mas efectividad dentro del terreno de juego. Estos jugadores son Raheem Sterling y Harry Kane que son los que se encuentran mas hacia abajo y a la izquierda de la grafica 
+
+
+```{r eval = TRUE, echo = FALSE}
+
+g5 <- ggplot(max_gol, aes(x=minutosjugados, y=minutopgol, size = , color = jugador)) +
+  geom_point(alpha=0.9) +
+  scale_size(range = c(120, 3400), name="Minutos por Gol") +
+  scale_color_viridis(discrete=TRUE, guide=FALSE) +
+  theme_stata() +
+  theme(legend.position="none")+ labs(title="Goles por Minuto Jugados por Jugador", 
+         subtitle="Temporada 19/20", 
+         caption="Elaboracion propia", x = "Minutos Jugados", y = "Gol por Minuto")
+
+
+g5
+
+```
+
+
+
+```{r eval = TRUE, echo = FALSE }
+
+embed_url("https://www.youtube.com/watch?v=MeOy4ubmrGI&ab_channel=LCFC")
+
+```
+
+
+
+----------------
+
+
+#  <FONT COLOR="darkblue">5. Estadios de los Equipos de Primera Division Temporada 19/20</FONT>
+
+Para complementar este analisis conoceremos los estadios de los 20 equipos que se dejaron la piel este año combatiendo partido a partido en estos grandes campos de juego. Nos encontramos con la ubicacion de cada uno de los campos en las distintas ciudades de Inglaterra. Como dato interesante la distancia mas larga recorrida entre dos equipos es de 568 kilometros, que es la distancia que tienen que recorrer los equipos New Castle United y Bournemouth para sus respectivos enfrentamientos. Ademas podemos destacar la ciudad de Liverpool donde los estadios del Liverpool y el Everton los separa una distancia solo de 1,9 kilometros. Por ultimo podemos observar que en la ciudad de Londres se encuentran 5 equipos los cuales son: West Ham United, Chelsea, Tottenham, Arsenal y el Crystal Palace. 
+
+
+```{r eval = TRUE, echo = FALSE}
+
+p <- leaflet() %>%
+  addTiles() %>% 
+  setView(lng = -2.435973, lat = 52.378051, zoom = 6) %>% 
+  addMarkers(lng = -0.1909, lat = 51.4818, popup = "Stamford Bridge (Chelsea)") %>% 
+  addMarkers(lng = -0.0163, lat = 51.5388, popup = "London Stadium (West Ham United)") %>%
+  addMarkers(lng = -0.1084, lat = 51.5550, popup = "Emirates Stadium (Arsenal)") %>%
+  addMarkers(lng = -0.0663, lat = 51.6044, popup = "Tottenham Hotspur Stadium (Tottenham)") %>%
+  addMarkers(lng = -0.0856, lat = 51.4000, popup = "Selhurst Park (Crystal Palace)") %>%
+  addMarkers(lng = -2.9607, lat = 53.4309, popup = "Anfield (Liverpool)") %>%
+  addMarkers(lng = -2.2004, lat = 53.4832, popup = "Etihad Stadium (Manchester City)") %>%
+  addMarkers(lng = -2.2911, lat = 53.4635, popup = "Old Trafford (Manchester United)") %>%
+  addMarkers(lng = -2.9663, lat = 53.4389, popup = "Goodison Park (Everton)") %>%
+  addMarkers(lng = -1.1421, lat = 52.6205, popup = "King Power Stadium (Leicester City)") %>%
+  addMarkers(lng = -2.1303, lat = 52.5903, popup = "Molineux Stadium (Wolverhampton Wanderers)") %>%
+  addMarkers(lng = -1.4698, lat = 53.3701, popup = "Bramall Lane (Sheffield United)") %>%
+  addMarkers(lng = -1.6216, lat = 54.9756, popup = "St James Park (New Castle United") %>%
+  addMarkers(lng = -2.2304, lat = 53.7888, popup = "Turf Moor (Burnley)") %>%
+  addMarkers(lng = -1.3909, lat = 50.9060, popup = "St Marys Stadium (Southampton)") %>%
+  addMarkers(lng = -0.0849, lat = 50.8630, popup = "Falmer Stadium (Brighton & Hove Albion)") %>%
+  addMarkers(lng =  1.3095, lat = 52.6232, popup = "Carrow Road (Norwich City)") %>%
+  addMarkers(lng = -0.4016, lat = 51.6500, popup = "Vicarage Road (Watford)") %>%
+  addMarkers(lng = -1.8382, lat = 50.7354, popup = "Dean Court (Bournemouth)") %>%
+  addMarkers(lng = -1.8848, lat = 52.5092, popup = "Villa Park (Aston Villa)")
+
+p
+
+```
+
+----------------
+
+#  <FONT COLOR="darkblue">6. Conclusión</FONT>
+
+La atipica temporada 2019-2020 nos ha dejado unos recuerdos inolvidables que son para la historia de este gran campeonato. La pandemia del covid-19 no impidio que el Liverpool levantara su ansiada y esperada Premier League luego de 30 años de sequia domestica. Su futbol arrollador y dominante destaco rompiendo records y consiguiendo una unica derrota en toda la temporada. Ademas, La inclusion del VAR desde mi punto de vista ha sido favorable para esta competicion ya que ha dotado al conjunto arbitral con una ayuda extra en el estudio de jugadas decisivas. Tambien podemos acotar que no hubo una gran competencia o disputa para la consecucion de los puestos para la Champions League ya que tanto el Liverpool (campeon) y el Manchester City presentaban una amplia ventaja en puntos con el resto de sus competidores. Sin embargo, la fuerte pelea por estos ultimos puestos europeos (tercero y cuarto clasificado) fue la frenetica disputa de varios equipos (Leicester, Tottenham, Wolves) que al final terminaron como vencedores el Chelsea y el Manchester United. 
+ 
+
+
+#  <FONT COLOR="darkblue">Referencias</FONT>
+
+Para la realización del trabajo he utilizado:
+
+- [enlace a El Comercio](https://elcomercio.pe/deporte-total/futbol-mundial/liverpool-campeon-jurgen-klopp-tras-ganar-la-premier-league-es-increible-ser-campeon-con-este-equipo-noticia/)
+
+- [enlace a Marca](https://www.marca.com/claro-mx/futbol/premier-league/posiciones.html)
+
+- [enlace a wikipedia](https://es.wikipedia.org/wiki/Premier_League_2019-20)
+
+- [enlace a The R Graph Gallery](https://www.r-graph-gallery.com/)
+
+- [enlace a tutoriales](https://perezp44.github.io/intro-ds-20-21-web/04-tutoriales.html)
+
+- [enlace a pagina oficial de la liga](https://www.premierleague.com/stats/top/players/goals?se=274)
+
+----------------
+
+<br><br>
+
+Para acabar este chunk para incluir tu `session info`:
+
+```{r}
+sessioninfo::session_info() %>% details::details(summary = 'current session info') 
+```
+
+
