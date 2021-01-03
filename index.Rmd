@@ -6,7 +6,7 @@ date: "Diciembre de 2020 (actualizado el `r format(Sys.time(), '%d-%m-%Y')`)"
 output:
   html_document:
     #css: "./assets/my_css_file.css"
-    theme: paper
+    theme: journal
     highlight: textmate 
     toc: true
     toc_depth: 3 
@@ -47,7 +47,7 @@ knitr::opts_chunk$set(echo = TRUE, eval = TRUE, message = FALSE, warning = FALSE
                       #fig.width = 7, #fig.height= 7,   
                       #out.width = 7, out.height = 7,
                       collapse = TRUE,  fig.show = "hold",
-                      fig.asp = 7/9, out.width = "85%", fig.align = "center")
+                      fig.asp = 7/9, out.width = "60%", fig.align = "center")
 knitr::opts_chunk$set(dev = "png", dev.args = list(type = "cairo-png"))
 ```
 
@@ -155,7 +155,7 @@ kable(clasif) %>%
 
 ### <FONT COLOR="darkblue">Una forma de visualizar los puntos obtenidos en la liga</FONT>
 
-```{r eval=TRUE, echo=FALSE}
+```{r eval=TRUE, echo=FALSE, out.width = "80%"}
 
 clasif_2 <- clasif %>% select(c(Equipo, Pts))
 
@@ -164,15 +164,6 @@ wordcloud2(data = clasif_2, size = 0.3)
 ```
 
 ----------------
-
-
-# <FONT COLOR="darkblue">Evolucion Partidos cada Jornada</FONT>
-
-En este grafico podemos observar la evolucion en la posicion de los equipos por cada jornada jugada. Muy claro dese el principio, el Manchester City y el Liverpool claros candidatos a llevarse el titulo ya que comenzaron ganando partido tras partido con respecto a sus otros contrincantes. Por lo que la verdadera batalla estuvo en os puestos europeos desde la tercera posicion hasta la sexta.
-
-
-
-
 
 ```{r eval = TRUE, echo = FALSE}
 knitr::include_graphics(here::here("imagenes", "liverpool-champions.jpg"))
@@ -191,7 +182,7 @@ En esta grafica podemos observar la clasificacon a competiciones europeas de los
 
 ### <FONT COLOR="darkblue">**Grafico 1**</FONT> 
 
-```{r eval = TRUE, echo = FALSE}
+```{r eval = TRUE, echo = FALSE, out.width = "80%"}
 
 p <- ggplot(clasif_1, aes(x = Equipo, y = Pts)) + 
   geom_col(fill = c("midnightblue", "midnightblue", "midnightblue", 
@@ -212,11 +203,12 @@ p + labs(title = "Clasificacion Siguiente Temporada",
 
 ### <FONT COLOR="darkblue">**Grafico 2**</FONT> 
 
-```{r eval = TRUE, echo = FALSE}
+
+```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
 
 g2 <- ggplot (clasif_1, aes(x=Equipo, y = Pts), aes(fct_rev(Equipo))) + 
   geom_bar(stat="identity",aes(fill = Clasif2021)) +
-  coord_flip() + theme(legend.position = "none") + labs(title = "Clasificacion Siguiente Temporada",
+  coord_flip() + theme_bw() + labs(title = "Clasificacion Siguiente Temporada",
            subtitle = "(Europa y Descenso)",
            caption = "Elaboracion propia",
            x = "Equipos",
@@ -225,6 +217,7 @@ g2 <- ggplot (clasif_1, aes(x=Equipo, y = Pts), aes(fct_rev(Equipo))) +
 g2
 
 ```
+
 
 
 ----------------
@@ -239,7 +232,7 @@ En este grafico 3 estudiamos a los 5 grandes clubes que anotaron mayores goles e
 
 ### <FONT COLOR="darkblue">**Grafico 3**</FONT> 
 
-```{r eval=TRUE, echo=FALSE}
+```{r eval=TRUE, echo=FALSE, out.width = "80%"}
 
 p <- ggplot(top_gf, aes(x = Equipo, y = GF)) + 
   geom_bar(stat = "identity", fill = c("cadetblue1", "red", "mediumblue", "mediumblue", "red")) +
@@ -259,7 +252,7 @@ p
 
 ### <FONT COLOR="darkblue">**Grafico 4**</FONT> 
 
-```{r eval = TRUE, echo=FALSE}
+```{r eval = TRUE, echo=FALSE, out.width = "80%"}
 
 g4 <- ggplot(clasif, aes(x=Equipo, y=GF)) + 
     geom_point(col="darkblue", size=3) +   
@@ -311,19 +304,18 @@ kable(max_gol) %>%
 Esta vez analizamos los goles anotados por cada minuto de juego, podemos observar que los jugaodres con menor ratio de goles por minuto y que tienen menos minutos dentro de la cancha son los jugadores con mas efectividad dentro del terreno de juego. Estos jugadores son Raheem Sterling y Harry Kane que son los que se encuentran mas hacia abajo y a la izquierda de la grafica 
 
 
-```{r eval = TRUE, echo = FALSE}
+```{r eval = TRUE, echo = FALSE, out.width = "85%"}
 
 g5 <- ggplot(max_gol, aes(x=minutosjugados, y=minutopgol, size = , color = jugador)) +
   geom_point(alpha=0.9) +
   scale_size(range = c(120, 3400), name="Minutos por Gol") +
-  scale_color_viridis(discrete=TRUE, guide=FALSE) +
-  theme_stata() +
-  theme(legend.position="none")+ labs(title="Goles por Minuto Jugados por Jugador", 
-         subtitle="Temporada 19/20", 
-         caption="Elaboracion propia", x = "Minutos Jugados", y = "Gol por Minuto")
+  scale_color_viridis(discrete=TRUE, guide=FALSE) + theme_stata() +
+  theme(legend.position="none") + 
+  labs(title="Goles por Minuto Jugados por Jugador", 
+  subtitle="Temporada 19/20", 
+  caption="Elaboracion propia", x = "Minutos Jugados", y = "Gol por Minuto")
 
-
-g5
+ggplotly(g5)
 
 ```
 
