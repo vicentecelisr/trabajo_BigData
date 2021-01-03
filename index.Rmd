@@ -38,6 +38,7 @@ library(reactable)
 library(vembedr)
 library(viridis)
 library(hrbrthemes)
+library(gt)
 ```
 
 ```{r chunk-setup, include = FALSE}
@@ -100,7 +101,9 @@ clasif <- read_excel("./datos/premier-league.xlsx", sheet = 1)
 
 max_gol <- read_excel("./datos/premier-league.xlsx", sheet = 2 )
 
-jornada <- read_excel("./datos/premier-league.xlsx", sheet = 3 )
+asistencia <- read_excel("./datos/premier-league.xlsx", sheet = 3 )
+
+premio <- read_excel("./datos/premier-league.xlsx", sheet = 4 )
 
 clasif_1 <- clasif %>% filter(!(is.na(Clasif2021))) %>% select(Pos, Equipo, Pts, Clasif2021)
 
@@ -306,16 +309,16 @@ Esta vez analizamos los goles anotados por cada minuto de juego, podemos observa
 
 ```{r eval = TRUE, echo = FALSE, out.width = "85%"}
 
-g5 <- ggplot(max_gol, aes(x=minutosjugados, y=minutopgol, size = , color = jugador)) +
-  geom_point(alpha=0.9) +
-  scale_size(range = c(120, 3400), name="Minutos por Gol") +
-  scale_color_viridis(discrete=TRUE, guide=FALSE) + theme_stata() +
-  theme(legend.position="none") + 
-  labs(title="Goles por Minuto Jugados por Jugador", 
-  subtitle="Temporada 19/20", 
-  caption="Elaboracion propia", x = "Minutos Jugados", y = "Gol por Minuto")
+g5 <- ggplot(max_gol, aes(x=minutosjugados, y=minutopgol, color = jugador)) +
+  geom_point() + labs(title="Goles por Minuto Jugados por Jugador", 
+       subtitle="Temporada 19/20", 
+       caption="Elaboracion propia", x = "Minutos Jugados", y = "Gol por Minuto") +
+  theme_stata() + theme(legend.position = "none") +
+  ggrepel::geom_label_repel(ggplot2::aes(label = jugador))
 
-ggplotly(g5)
+
+g5
+
 
 ```
 
@@ -328,11 +331,66 @@ embed_url("https://www.youtube.com/watch?v=MeOy4ubmrGI&ab_channel=LCFC")
 ```
 
 
+----------------
+
+# <FONT COLOR="darkblue">5. Analisis Asistencias</FONT>
+
+El maximo asistidor y con mucha diferencia es el futbolista belga Kevin De Bruyne con unas 20 asistencias seguido de 3 jugadores del club campeon el Liverpool los cuales son Trent Alexander-Arnold, Andrew Robertson y Mohamed Salah. El jugador belga considerado el mejor mediocampista ofensivo de la epoca ha sido premiado con el premio playmaker en la liga que es el nuevo premio que entregará la Premier League para reconocer al mejor orquestador de la temporada. 
+
+
+>"Me siento bien. Significa que he hecho un buen trabajo. Soy un creador y trato de crear oportunidades para mis compañeros de equipo. Si anotan, obtengo la asistencia y me veo bien" Kevin De Bruyne.
+
+A esas asistencias también hay que sumarle 8 tantos, por lo que su impacto en el juego le ha proporcionado al Manchester City un total de 24 goles. Su temporada en todas las competiciones se resume con unos excelentes números: 12 goles y 21 asistencias en 52 partidos.
+
+
+
+```{r eval = TRUE, echo = FALSE}
+
+asistencia <- asistencia %>% select(c(Jugador, asistencias, nacionalidad))
+
+nacionalidad <- c(here::here("imagenes", "r-belgica.png"), here::here("imagenes", "Flag_of_England.svg"), here::here("imagenes", "scotland.png"), here::here("imagenes", "Egypt.svg"), here::here("imagenes", "Spain.svg.webp"), here::here("imagenes", "South_Korea.svg"), here::here("imagenes", "Algeria.svg"), here::here("imagenes", "Spain.svg.webp"), here::here("imagenes", "Flag_of_England.svg"), here::here("imagenes", "Brazil.svg.png"))
+
+
+
+asistencia %>% gt() %>% 
+  gt::text_transform(locations = cells_body(columns = vars(nacionalidad)),
+                     fn = function(x) {gt::web_image(x, height = 50)}) %>% tab_header(title = md("**Maximos Asistidores**"),subtitle = md("**Temporada 2019/2020**")) %>%
+  tab_options(heading.background.color = "lightblue", column_labels.font.weight = "bold")
+
+```
+
 
 ----------------
 
+# <FONT COLOR="darkblue">6. Premios en la Temporada</FONT>
 
-#  <FONT COLOR="darkblue">5. Estadios de los Equipos de Primera Division Temporada 19/20</FONT>
+
+Los mas galardonados de la temporada, ya mencionado anteriormente, sin duda alguna el mas destacado, el futbolista kevin De Bruyne fue el MVP mejor jugador de la temporada y recibio el premio playmaker al mejor armador de juego en la temporada. Tambien podemos destacar el gol de la temporada anotado por el coreano Heugh-Min Son que lo podemos ver luego de la tabla. La bota de Oro para el mayor anotador mencionado antes Jamie Vardy. mejor jugador mas joven o golden boy de la temporada se lo lleva el jugador del Liverpool Alexander-Arnold. Tambien vemos premios como al mejor manager Jurguen Klopp y el guante de oro para el portero del Manchester City Ederson. 
+
+
+```{r eval = TRUE, echo = FALSE}
+
+kable(premio) %>%
+  kableExtra::kable_styling(fixed_thead = list(enabled = T, background = "lightblue")) %>%
+  kable_paper(full_width = F) %>% row_spec(1, bold = T, color = "white", background = "#D7261E") %>% row_spec(7, bold = T, color = "white", background = "#D7261E") %>%
+  column_spec(2, color = "black",
+              link = "https://www.tudn.com/futbol/premier-league/jurgen-klopp-y-kevin-de-bruyne-son-el-mejor-tecnico-y-jugador-de-la-premier-league")
+
+
+```
+
+
+```{r eval = TRUE, echo = FALSE }
+
+embed_url("https://www.youtube.com/watch?v=IwH4KReJ4KE&ab_channel=TottenhamHotspur")
+
+```
+
+
+
+----------------
+
+#  <FONT COLOR="darkblue">7. Estadios de los Equipos de Primera Division Temporada 19/20</FONT>
 
 Para complementar este analisis conoceremos los estadios de los 20 equipos que se dejaron la piel este año combatiendo partido a partido en estos grandes campos de juego. Nos encontramos con la ubicacion de cada uno de los campos en las distintas ciudades de Inglaterra. Como dato interesante la distancia mas larga recorrida entre dos equipos es de 568 kilometros, que es la distancia que tienen que recorrer los equipos New Castle United y Bournemouth para sus respectivos enfrentamientos. Ademas podemos destacar la ciudad de Liverpool donde los estadios del Liverpool y el Everton los separa una distancia solo de 1,9 kilometros. Por ultimo podemos observar que en la ciudad de Londres se encuentran 5 equipos los cuales son: West Ham United, Chelsea, Tottenham, Arsenal y el Crystal Palace. 
 
@@ -369,7 +427,7 @@ p
 
 ----------------
 
-#  <FONT COLOR="darkblue">6. Conclusión</FONT>
+#  <FONT COLOR="darkblue">8. Conclusión</FONT>
 
 La atipica temporada 2019-2020 nos ha dejado unos recuerdos inolvidables que son para la historia de este gran campeonato. La pandemia del covid-19 no impidio que el Liverpool levantara su ansiada y esperada Premier League luego de 30 años de sequia domestica. Su futbol arrollador y dominante destaco rompiendo records y consiguiendo una unica derrota en toda la temporada. Ademas, La inclusion del VAR desde mi punto de vista ha sido favorable para esta competicion ya que ha dotado al conjunto arbitral con una ayuda extra en el estudio de jugadas decisivas. Tambien podemos acotar que no hubo una gran competencia o disputa para la consecucion de los puestos para la Champions League ya que tanto el Liverpool (campeon) y el Manchester City presentaban una amplia ventaja en puntos con el resto de sus competidores. Sin embargo, la fuerte pelea por estos ultimos puestos europeos (tercero y cuarto clasificado) fue la frenetica disputa de varios equipos (Leicester, Tottenham, Wolves) que al final terminaron como vencedores el Chelsea y el Manchester United. 
  
@@ -389,7 +447,11 @@ Para la realización del trabajo he utilizado:
 
 - [enlace a tutoriales](https://perezp44.github.io/intro-ds-20-21-web/04-tutoriales.html)
 
-- [enlace a pagina oficial de la liga](https://www.premierleague.com/stats/top/players/goals?se=274)
+- [enlace a pagina oficial de la liga de Inglaterra](https://www.premierleague.com/stats/top/players/goals?se=274)
+
+- [enlace a TUDN](https://www.tudn.com/futbol/premier-league/jurgen-klopp-y-kevin-de-bruyne-son-el-mejor-tecnico-y-jugador-de-la-premier-league)
+
+
 
 ----------------
 
