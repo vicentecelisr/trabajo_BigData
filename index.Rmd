@@ -64,7 +64,7 @@ klippy::klippy(position = c("top", "right")) #- remotes::install_github("rlesur/
 
 <hr class="linea-black">
 
-Trabajo elaborado para la asignatura "Programación y manejo de datos en la era del Big Data" de la Universitat de València durante el curso 2020-2021. El repo del trabajo está [aquí](https://github.com/vicentecelisr/trabajo_BigData){target="_blank"}. La página web de la asignatura y los trabajos de mis compañeros pueden verse [aquí](https://vicentecelisr.github.io/intro-ds-20-21-web/07-trabajos.html){target="_blank"}.
+Trabajo elaborado para la asignatura "Programación y manejo de datos en la era del Big Data" de la Universitat de València durante el curso 2020-2021. El repo del trabajo está [aquí](https://github.com/vicentecelisr/trabajo_BigData){target="_blank"}. La página web de la asignatura y los trabajos de mis compañeros pueden verse [aquí](https://perezp44.github.io/intro-ds-20-21-web/07-trabajos.html){target="_blank"}.
 
 <hr class="linea-red">
 
@@ -265,8 +265,8 @@ g4 <- ggplot(clasif, aes(x=Equipo, y=GF)) +
                      yend=max(GF)), 
                  linetype="dotted", 
                  size=0.1) +   
-    labs(title="Mas Goles Anotados en la Temporada 19/20", 
-         subtitle="Make Vs Avg. Mileage", 
+    labs(title="Mas Goles Anotados", 
+         subtitle="Temporada 19/20", 
          caption="Elaboracion propia", y = "Goles A Favor") +  
     coord_flip()
 
@@ -354,7 +354,7 @@ nacionalidad <- c(here::here("imagenes", "r-belgica.png"), here::here("imagenes"
 
 asistencia %>% gt() %>% 
   gt::text_transform(locations = cells_body(columns = vars(nacionalidad)),
-                     fn = function(x) {gt::web_image(x, height = 50)}) %>% tab_header(title = md("**Maximos Asistidores**"),subtitle = md("**Temporada 2019/2020**")) %>%
+                     fn = function(x) {gt::web_image(x, height = 70)}) %>% tab_header(title = md("**Maximos Asistidores**"),subtitle = md("**Temporada 2019/2020**")) %>%
   tab_options(heading.background.color = "lightblue", column_labels.font.weight = "bold")
 
 ```
