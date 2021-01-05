@@ -90,7 +90,7 @@ Este trabajo se realiza con el fin de analizar las estadisticas de los equipos y
 ### <FONT COLOR="darkblue">**Fuente de los Datos**</FONT> 
 
 
-Los datos fueron obtenidos de varias paginas como el diario Marca, Wikipedia y la pagina oficial de la Premier Leaguey luego fueron modificados por mi en un excel incluido en la carpeta datos. La manipulacion de los datos se realizaron gracias a los slides y tutoriales sumkn istrados por el profesor de la materia Pedro Perez.
+Los datos fueron obtenidos de varias paginas como el diario Marca, Wikipedia y la pagina oficial de la Premier Leaguey luego fueron modificados por mi en un excel incluido en la carpeta datos. La manipulacion de los datos se realizaron gracias a los slides y tutoriales suministrados por el profesor de la materia Pedro Perez.
 
 
 ### <FONT COLOR="darkblue">**Codigos**</FONT>
