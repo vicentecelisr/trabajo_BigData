@@ -90,7 +90,7 @@ Este trabajo se realiza con el fin de analizar las estadisticas de los equipos y
 ### <FONT COLOR="darkblue">**Fuente de los Datos**</FONT> 
 
 
-Los datos fueron obtenidos de varias paginas como el diario Marca, Wikipedia y la pagina oficial de la Premier Leaguey luego fueron modificados por mi en un excel incluido en la carpeta datos. La manipulacion de los datos se realizaron gracias a los slides y tutoriales suministrados por el profesor de la materia Pedro Perez.
+Los datos fueron obtenidos de varias paginas como el diario Marca, Wikipedia y la pagina oficial de la Premier League y luego fueron modificados por mi en un excel incluido en la carpeta datos. La manipulacion de los datos se realizaron gracias a los slides y tutoriales suministrados por el profesor de la materia Pedro Perez.
 
 
 ### <FONT COLOR="darkblue">**Codigos**</FONT>
@@ -210,7 +210,7 @@ p + labs(title = "Clasificacion Siguiente Temporada",
 ```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
 
 g2 <- ggplot (clasif_1, aes(x=Equipo, y = Pts), aes(fct_rev(Equipo))) + 
-  geom_bar(stat="identity",aes(fill = Clasif2021)) +
+  geom_bar(stat="identity",aes(fill = Clasif2021)) + scale_y_discrete(breaks= c('0', '25', '50', '75', '100')) +
   coord_flip() + theme_bw() + labs(title = "Clasificacion Siguiente Temporada",
            subtitle = "(Europa y Descenso)",
            caption = "Elaboracion propia",
@@ -220,7 +220,6 @@ g2 <- ggplot (clasif_1, aes(x=Equipo, y = Pts), aes(fct_rev(Equipo))) +
 g2
 
 ```
-
 
 
 ----------------
@@ -348,13 +347,19 @@ A esas asistencias también hay que sumarle 8 tantos, por lo que su impacto en e
 
 asistencia <- asistencia %>% select(c(Jugador, asistencias, nacionalidad))
 
-nacionalidad <- c(here::here("imagenes", "r-belgica.png"), here::here("imagenes", "Flag_of_England.svg"), here::here("imagenes", "scotland.png"), here::here("imagenes", "Egypt.svg"), here::here("imagenes", "Spain.svg.webp"), here::here("imagenes", "South_Korea.svg"), here::here("imagenes", "Algeria.svg"), here::here("imagenes", "Spain.svg.webp"), here::here("imagenes", "Flag_of_England.svg"), here::here("imagenes", "Brazil.svg.png"))
-
-
 
 asistencia %>% gt() %>% 
   gt::text_transform(locations = cells_body(columns = vars(nacionalidad)),
-                     fn = function(x) {gt::web_image(x, height = 70)}) %>% tab_header(title = md("**Maximos Asistidores**"),subtitle = md("**Temporada 2019/2020**")) %>%
+                     fn = function(x) {gt::web_image(c("https://simbologiadelmundo.com/wp-content/uploads/2016/06/r-belgica.png",
+                  "https://upload.wikimedia.org/wikipedia/commons/b/be/Flag_of_England.svg",
+                  "https://trucoslondres.com/wp-content/uploads/2017/09/scotland-891914_1920-300x180.png",
+                  "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg",
+                  "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/1200px-Flag_of_Spain.svg.png",
+                  "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg",
+                  "https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_Algeria.svg",
+                  "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/1200px-Flag_of_Spain.svg.png",
+                  "https://upload.wikimedia.org/wikipedia/commons/b/be/Flag_of_England.svg",
+                  "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/300px-Flag_of_Brazil.svg.png"), height = 20)}) %>% tab_header(title = md("**Maximos Asistidores**"),subtitle = md("**Temporada 2019/2020**")) %>%
   tab_options(heading.background.color = "lightblue", column_labels.font.weight = "bold")
 
 ```
@@ -450,6 +455,33 @@ Para la realización del trabajo he utilizado:
 - [enlace a pagina oficial de la liga de Inglaterra](https://www.premierleague.com/stats/top/players/goals?se=274)
 
 - [enlace a TUDN](https://www.tudn.com/futbol/premier-league/jurgen-klopp-y-kevin-de-bruyne-son-el-mejor-tecnico-y-jugador-de-la-premier-league)
+
+
+
+
+
+```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
+
+g2 <- ggplot (clasif_1, aes(x=Equipo, y = Pts), aes(fct_rev(Equipo))) + 
+  geom_bar(stat="identity",aes(fill = Clasif2021)) + scale_y_discrete(breaks= c('0', '25', '50', '75', '100')) +
+  coord_flip() + theme_bw() + labs(title = "Clasificacion Siguiente Temporada",
+           subtitle = "(Europa y Descenso)",
+           caption = "Elaboracion propia",
+           x = "Equipos",
+           y = "Puntos totales")
+
+
+
+```
+
+
+```{r, eval = TRUE, echo = FALSE, out.width = "80%"}
+
+
+ggplotly(g2)
+
+```
+
 
 
 
